@@ -1,0 +1,20 @@
+/* Altura total da tela menos a barra superior (que tem 64px) */
+.container-principal {
+  height: calc(100vh - 64px);
+}
+
+.menu-lateral {
+  width: 250px;
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+}
+
+.area-conteudo {
+  background-color: #f4f7f6;
+}
+
+.header-sombra {
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 2;
+}

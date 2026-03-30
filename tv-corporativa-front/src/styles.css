@@ -1,0 +1,10 @@
+/* src/styles.css */
+@import "@angular/material/prebuilt-themes/azure-blue.css";
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+
+html, body { 
+  height: 100%; 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f5f7f9 !important; /* O !important força a cor */
+}
