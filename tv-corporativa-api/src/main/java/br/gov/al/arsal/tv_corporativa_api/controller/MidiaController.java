@@ -22,6 +22,11 @@ public class MidiaController {
         MidiaDTO midiaSalva = midiaService.salvarMidia(midiaDTO);
         return ResponseEntity.status(201).body(midiaSalva);
     }
+    @GetMapping
+    public ResponseEntity<List<MidiaDTO>> listar(){
+        List<MidiaDTO> lista = midiaService.listarMidias();
+        return ResponseEntity.ok(lista);
+    }
 }
 
 

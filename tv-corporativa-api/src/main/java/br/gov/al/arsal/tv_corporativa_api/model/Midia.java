@@ -10,7 +10,7 @@ import lombok.Setter;
 @Table(name = "tb_midia")
 @Getter
 @Setter
-@NoArgsConstructor
+
 @AllArgsConstructor
 public class Midia {
 
@@ -26,7 +26,7 @@ public class Midia {
     private String url;
     private Integer duracaoSegundos;
 
-
+    public Midia() {}
 
 
 }
