@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-
-
-import { MidiaService } from '../../services/midia'; 
-
+import { MidiaService } from '../../services/midia';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+
+
+import { MatCardModule } from '@angular/material/card'; 
+
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-lista-midias',
@@ -13,12 +15,15 @@ import { MatIconModule } from '@angular/material/icon';
   imports: [
     MatTableModule, 
     MatButtonModule, 
-    MatIconModule    
+    MatIconModule,
+    MatCardModule,
+    RouterModule 
   ],
   templateUrl: './lista-midias.html',
   styleUrl: './lista-midias.css',
 })
 export class ListaMidias implements OnInit {
+ 
 
   listaDeVideos = new MatTableDataSource<any>([]);
   

@@ -1,0 +1,158 @@
+/* 🌑 Fundo Total Gemini Claro (Igual à TONALIDADE solicitada) */
+.container-cadastro-gemini {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  background-color: #f5f7f9 !important; /* 👇 Cor clara solicitada */
+  min-height: calc(100vh - 64px - 60px);
+}
+
+/* 🧱 O Cartão "Gemini" com Super Arredondamento */
+.cartao-gemini {
+  width: 100%;
+  max-width: 750px;
+  background-color: #ffffff !important; /* 👇 Fundo branco puro do prompt */
+  border-radius: 30px !important; /* 👈 Arredondamento agressivo! */
+  padding: 30px;
+  border: 1px solid #f0f2f5;
+  color: #333 !important;
+}
+
+/* Header Minimalista */
+.header-gemini {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #f0f2f5;
+  padding-bottom: 15px;
+}
+
+.icone-titulo-gemini {
+  font-size: 40px;
+  height: 40px;
+  width: 40px;
+  /* 👇 Usando o azul corporativo da ARSAL como destaque */
+  color: #0f4c81; 
+}
+
+.titulo-gemini {
+  color: #1a202c !important;
+  font-size: 22px !important;
+  font-weight: 600 !important;
+}
+
+.subtitle-gemini {
+  color: #a1a5aa !important;
+}
+
+/* Conteúdo */
+.conteudo-gemini {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* 🖊️ Estilizando os Inputs para ficarem no Formato CAPSULE/PILL Gemini */
+::ng-deep .campo-capsule .mat-mdc-text-field-wrapper {
+  background-color: #ffffff !important; /* 👇 Fundo branco puro */
+  border-radius: 30px !important; /* 👈 Super arredondamento */
+}
+
+::ng-deep .campo-capsule .mat-mdc-form-field-outline {
+  color: #f0f2f5 !important; /* Cor da borda padrão */
+}
+
+::ng-deep .campo-capsule.mat-focused .mat-mdc-form-field-outline {
+  color: #1a73e8 !important; /* Cor da borda no foco */
+}
+
+::ng-deep .campo-capsule .mat-mdc-input-element {
+  color: #333 !important; /* Cor do texto digitado */
+}
+
+.label-gemini {
+  color: #a1a5aa !important; /* Cor da label */
+}
+
+/* Ícones dos Inputs Minimalistas */
+.icone-input-gemini {
+  color: #a1a5aa !important;
+}
+
+.icone-add {
+  color: #1a73e8 !important; /* Ícone + azul do Gemini */
+}
+
+.campo-total-gemini {
+  width: 100%;
+}
+
+.linha-gemini {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.campo-tempo-gemini {
+  width: 150px;
+}
+
+/* 🔘 Botões Toggle (Estilo Botões Pílula/Pill Gemini) */
+.campo-tipo-gemini {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.label-input-gemini {
+  color: #a1a5aa;
+  font-size: 14px;
+}
+
+.toggle-gemini {
+  border: 1px solid #f0f2f5 !important;
+  background-color: #ffffff !important;
+  border-radius: 30px !important; /* 👈 Arredondamento agressivo! */
+  overflow: hidden;
+}
+
+::ng-deep .toggle-gemini .mat-button-toggle {
+  color: #333 !important;
+  border-left: 1px solid #f0f2f5 !important;
+}
+
+::ng-deep .toggle-gemini .mat-button-toggle-checked {
+  /* 👇 Usando o azul corporativo da ARSAL como destaque */
+  background-color: #0f4c81 !important; 
+  color: white !important;
+}
+
+.icone-toggle {
+  color: inherit !important;
+}
+
+/* 🚀 Ações e Botões Arredondados (Pill Buttons) */
+.acoes-gemini {
+  margin-top: 40px;
+  padding: 0 !important;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+/* Botão Salvar Arredondado (Pill Button) Corporativo ARSAL */
+.botao-salvar-gemini {
+  /* 👇 Usando o azul corporativo da ARSAL como destaque */
+  background-color: #0f4c81 !important; 
+  color: white !important;
+  border-radius: 30px !important; /* 👈 Pill Button agressivo! */
+  padding: 22px 30px !important;
+  font-weight: 600 !important;
+}
+
+.botao-cancelar-gemini {
+  color: #a1a5aa !important;
+  border-radius: 30px !important;
+  padding: 22px 30px !important;
+}
