@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 
-export class Midia {
+export class MidiaService  {
 
   private readonly API = 'http://localhost:8080/api/midias';
 
