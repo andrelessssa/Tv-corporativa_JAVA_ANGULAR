@@ -1,0 +1,11 @@
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;                 /* Ocupa o resto da tela */
+  margin-left: 230px;      /* Empurra o conteúdo para o lado da sidebar */
+  padding: 40px;           /* Dá um respiro para o conteúdo */
+  min-height: 100vh;
+}

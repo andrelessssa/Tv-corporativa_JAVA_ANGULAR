@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/out-tsc",
+    "rootDir": "src", // <--- Adicione esta linha aqui
+    "types": ["jasmine"]
+  },
+  
+  "include": [
+  "src/**/*.d.ts",
+  "src/main.server.ts", 
+  "src/server.ts"
+]
+}
