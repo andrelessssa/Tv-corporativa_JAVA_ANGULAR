@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Midia } from './midia';
+import { MidiaService } from './midia';
 
 describe('Midia', () => {
-  let service: Midia;
+  let service: MidiaService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(Midia);
+    service = TestBed.inject(MidiaService);
   });
 
   it('should be created', () => {

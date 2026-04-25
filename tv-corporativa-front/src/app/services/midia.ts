@@ -1,19 +1,21 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http'; 
 import { Observable } from 'rxjs';
 
+
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root' 
 })
+export class MidiaService {
 
-export class MidiaService  {
+  
+  private readonly API = 'http://localhost:8080/api/videos';
 
-  private readonly API = 'http://localhost:8080/api/midias';
+  constructor(private http: HttpClient) { }
 
-  constructor( private http: HttpClient  ) { }
-
-  listarMidias() : Observable<any[]> {
+  
+  listarTodos(): Observable<any[]> {
+    
     return this.http.get<any[]>(this.API);
   }
-  
 }
