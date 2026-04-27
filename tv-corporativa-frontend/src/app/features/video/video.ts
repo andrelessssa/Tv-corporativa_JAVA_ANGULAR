@@ -13,8 +13,7 @@ export class Video implements OnInit {
   
   listaDeMidias: MidiaDTO[] = [];
   
-  // 1. VOCÊ PRECISA DECLARAR ESSA VARIÁVEL AQUI EM CIMA!
-  exibirFormulario: boolean = false; 
+    exibirFormulario: boolean = false; 
 
   constructor(private videoService: VideoService) {}
 
@@ -22,7 +21,7 @@ export class Video implements OnInit {
     this.carregarMidias();
   }
 
-  // 2. VOCÊ PRECISA CRIAR A FUNÇÃO QUE O HTML ESTÁ CHAMANDO!
+  // 2. CRIAR A FUNÇÃO QUE O HTML ESTÁ CHAMANDO!
 enviarDados(nome: string, url: string, duracao: any) {
   const novaMidia: MidiaDTO = {
     nome: nome,
