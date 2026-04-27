@@ -1,14 +1,50 @@
 <div class="video-container">
+  
   <div class="video-header">
     <div>
       <h1>Gestão de Conteúdo</h1>
-      <p>Adicione ou remova vídeos da grade de transmissão</p>
+      <p>Gerencie a grade de transmissão da TV Corporativa ARSAL</p>
     </div>
     
-    <button class="btn-add">
-      <span class="plus-icon">+</span>
-      Novo Vídeo
-    </button>
+    <button class="btn-add" (click)="exibirFormulario = true">
+  <span class="plus-icon">+</span>
+  Novo Vídeo
+</button>
+  </div>
+
+  <div class="modal-overlay" *ngIf="exibirFormulario" (click)="exibirFormulario = false">
+    
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      
+      <div class="modal-header">
+        <h3>🎬 Cadastrar Novo Conteúdo</h3>
+        <button class="btn-close" (click)="exibirFormulario = false">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="input-group">
+          <label>NOME DO ARQUIVO</label>
+          <input type="text" #nome class="arsal-input" placeholder="Ex: Campanha Arsal 2024">
+        </div>
+
+        <div class="input-group">
+          <label>DURAÇÃO (SEGUNDOS)</label>
+          <input type="number" #duracao class="arsal-input" value="30">
+        </div>
+
+        <div class="input-group full-width">
+          <label>URL DO VÍDEO (LINK OU CAMINHO DE REDE)</label>
+          <input type="text" #url class="arsal-input" placeholder="Ex: http://servidor/video.mp4">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="exibirFormulario = false">Cancelar</button>
+        <button class="btn-save" (click)="enviarDados(nome.value, url.value, duracao.value)">
+          💾 Salvar no Postgres
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="video-list-section">
@@ -17,24 +53,27 @@
         <thead>
           <tr>
             <th>Arquivo</th>
-            <th>Tamanho</th>
+            <th>Duração</th>
             <th>Data de Upload</th>
             <th>Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr *ngFor="let midia of listaDeMidias">
             <td>
               <div class="file-info">
                 <span class="file-icon">🎬</span>
                 <div>
-                  <p class="file-name">Institucional_Arsal_2024.mp4</p>
-                  <p class="file-meta">1080p • 24fps</p>
+                  <p class="file-name">{{ midia.nome }}</p>
+                  <p class="file-meta">URL: {{ midia.url }}</p>
                 </div>
               </div>
             </td>
-            <td>45 MB</td>
-            <td>15/10/2025</td>
+
+            <td>{{ midia.duracaoSegundos ? midia.duracaoSegundos + ' seg' : '--' }}</td>
+
+            <td>{{ midia.dataUpload | date: 'dd/MM/yyyy HH:mm' }}</td>
+
             <td>
               <div class="action-group">
                 <button class="btn-icon" title="Editar">✏️</button>
@@ -42,7 +81,14 @@
               </div>
             </td>
           </tr>
-          </tbody>
+
+          <tr *ngIf="listaDeMidias.length === 0">
+            <td colspan="4" style="text-align: center; padding: 50px; color: #8b949e;">
+              <div style="font-size: 24px; margin-bottom: 10px;">📡</div>
+              Aguardando conexão com o banco de dados da ARSAL...
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>

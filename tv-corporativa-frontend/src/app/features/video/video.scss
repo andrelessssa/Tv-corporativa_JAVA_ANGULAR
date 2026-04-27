@@ -1,41 +1,18 @@
-.video-container {
-  padding: 20px;
-}
+/* --- ESTILOS DA TABELA (PROTEGIDOS) --- */
+.video-container { padding: 20px; }
 
 .video-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
-
-  h1 { font-size: 24px; font-weight: 700; color: var(--text); }
-  p { color: var(--muted); font-size: 14px; }
-}
-
-.btn-add {
-  background: linear-gradient(135deg, var(--indigo), var(--pink));
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(129, 140, 248, 0.3);
-  }
-
-  .plus-icon { font-size: 20px; }
+  h1 { font-size: 24px; font-weight: 700; color: #fff; margin: 0; }
+  p { color: #8b949e; font-size: 14px; margin: 5px 0 0 0; }
 }
 
 .table-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: #161b22;
+  border: 1px solid #30363d;
   border-radius: 20px;
   overflow: hidden;
 }
@@ -47,25 +24,26 @@
   th {
     padding: 16px;
     text-align: left;
-    color: var(--muted);
+    color: #8b949e;
     font-size: 12px;
     text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid #30363d;
   }
 
   td {
     padding: 20px 16px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text);
+    border-bottom: 1px solid #30363d;
+    color: #c9d1d9;
+    vertical-align: middle;
   }
 
   .file-info {
     display: flex;
     align-items: center;
     gap: 15px;
-    .file-icon { font-size: 24px; }
-    .file-name { font-weight: 500; }
-    .file-meta { font-size: 12px; color: var(--muted); }
+    .file-icon { font-size: 24px; display: flex; align-items: center; }
+    .file-name { font-weight: 500; margin: 0; }
+    .file-meta { font-size: 12px; color: #8b949e; margin: 2px 0 0 0; }
   }
 }
 
@@ -73,12 +51,105 @@
   display: flex;
   gap: 10px;
   .btn-icon {
-    background: var(--surface2);
-    border: 1px solid var(--border);
+    background: #21262d;
+    border: 1px solid #30363d;
     padding: 8px;
     border-radius: 8px;
     cursor: pointer;
-    &:hover { background: rgba(255,255,255,0.1); }
-    &.delete:hover { background: rgba(248, 113, 113, 0.1); }
+    color: white;
+    transition: 0.2s;
+    &:hover { background: #30363d; }
+    &.delete:hover { background: rgba(248, 113, 113, 0.1); border-color: #f87171; }
   }
+}
+
+/* --- BOTÃO NOVO VÍDEO (RESTAURAÇÃO) --- */
+.btn-add {
+  background: linear-gradient(135deg, #6366f1, #ec4899); /* O gradiente roxo/rosa */
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(129, 140, 248, 0.3);
+  }
+
+  .plus-icon {
+    font-size: 20px;
+    font-weight: bold;
+  }
+}
+
+/* --- 🚀 ESTILOS DO MODAL (FLUTUANTE) --- */
+:host ::ng-deep {
+  .modal-overlay {
+    position: fixed !important;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+  }
+
+  .modal-card {
+    background: #1a1d21;
+    width: 100%;
+    max-width: 550px;
+    border-radius: 20px;
+    border: 1px solid #333;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    animation: surgindo 0.3s ease-out;
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      h3 { color: #a855f7; margin: 0; font-size: 1.2rem; }
+      .btn-close { background: none; border: none; color: #666; font-size: 24px; cursor: pointer; }
+    }
+
+    .modal-body {
+      padding: 25px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      .full-width { grid-column: span 2; }
+      label { display: block; font-size: 11px; color: #8b949e; font-weight: bold; margin-bottom: 8px; }
+      .arsal-input {
+        width: 100%; padding: 12px;
+        background: #0d1117; border: 1px solid #333;
+        border-radius: 10px; color: white;
+        &:focus { border-color: #a855f7; outline: none; }
+      }
+    }
+
+    .modal-footer {
+      padding: 20px;
+      background: #1f2227;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      .btn-cancel { background: transparent; border: 1px solid #444; color: white; padding: 10px 25px; border-radius: 8px; cursor: pointer; }
+      .btn-save { background: #a855f7; border: none; color: white; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    }
+  }
+}
+
+@keyframes surgindo {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
