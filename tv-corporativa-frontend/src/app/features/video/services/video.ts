@@ -33,4 +33,7 @@ export class VideoService {
     return this.http.delete<void>(`${this.API}/${id}`);
     
   }
+  buscarTotalMidias(): Observable<number> {
+    return this.http.get<number>(`${this.API}/total`);
+  }
 }

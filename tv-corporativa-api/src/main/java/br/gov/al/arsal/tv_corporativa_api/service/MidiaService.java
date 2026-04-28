@@ -36,4 +36,7 @@ public class MidiaService {
 
         midiaRepository.delete(midia);
     }
+    public long contarMidias() {
+        return midiaRepository.count();
+    }
 }

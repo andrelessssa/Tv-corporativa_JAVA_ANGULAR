@@ -28,11 +28,18 @@ public class MidiaController {
         List<MidiaDTO> lista = midiaService.listarMidias();
         return ResponseEntity.ok(lista);
     }
+    @GetMapping("/total")
+    public ResponseEntity<Long> contarMidias() {
+        long total = midiaService.contarMidias();
+        return ResponseEntity.ok(total);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarVideo(@PathVariable Long id) {
         midiaService.deletarVideo(id);
         return ResponseEntity.noContent().build();
     }
+
 }
 
 
