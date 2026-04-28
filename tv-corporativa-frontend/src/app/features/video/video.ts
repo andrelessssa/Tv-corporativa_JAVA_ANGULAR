@@ -45,5 +45,18 @@ enviarDados(nome: string, url: string, duracao: any) {
       error: (err) => console.error(err)
     });
   }
+  excluirVideo(id: number): void {
+    if (confirm('Tem certeza que deseja excluir este vídeo?')) {
+      this.videoService.excluirVideo(id).subscribe({
+        next: () => {
+          console.log('Vídeo excluído com sucesso! 🗑️');
+          this.carregarMidias();
+        },
+        error: (err) => console.error('Erro ao excluir vídeo:', err)
+      });
+    }
+  }
+
+
 
 }

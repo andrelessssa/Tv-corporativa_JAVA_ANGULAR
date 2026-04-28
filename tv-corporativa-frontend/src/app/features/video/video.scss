@@ -102,6 +102,19 @@
     z-index: 99999;
   }
 
+  .btn-excluir {
+    background: #21262d;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #cc0000;
+  }
+}
+
   .modal-card {
     background: #1a1d21;
     width: 100%;

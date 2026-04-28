@@ -30,4 +30,10 @@ public class MidiaService {
                 .map(m -> new MidiaDTO(m))
                 .toList();
     }
+    public void deletarVideo(Long id) {
+        Midia midia = midiaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mídia não encontrada com ID: " + id));
+
+        midiaRepository.delete(midia);
+    }
 }

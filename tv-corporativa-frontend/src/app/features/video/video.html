@@ -61,36 +61,42 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let midia of listaDeMidias">
-            <td>
-              <div class="file-info">
-                <span class="file-icon">🎬</span>
-                <div>
-                  <p class="file-name">{{ midia.nome }}</p>
-                  <p class="file-meta">URL: {{ midia.url }}</p>
-                </div>
-              </div>
-            </td>
+  <tr *ngFor="let midia of listaDeMidias">
+    <td>
+      <div class="file-info">
+        <span class="file-icon">🎬</span>
+        <div>
+          <p class="file-name">{{ midia.nome }}</p>
+          <p class="file-meta">URL: {{ midia.url }}</p>
+        </div>
+      </div>
+    </td>
 
-            <td>{{ midia.duracaoSegundos ? midia.duracaoSegundos + ' seg' : '--' }}</td>
+    <td>{{ midia.duracaoSegundos ? midia.duracaoSegundos + ' seg' : '--' }}</td>
 
-            <td>{{ midia.dataUpload | date: 'dd/MM/yyyy HH:mm' }}</td>
+    <td>{{ midia.dataUpload | date: 'dd/MM/yyyy HH:mm' }}</td>
 
-            <td>
-              <div class="action-group">
-                <button class="btn-icon" title="Editar">✏️</button>
-                <button class="btn-icon delete" title="Excluir">🗑️</button>
-              </div>
-            </td>
-          </tr>
+    <td>
+      <div class="action-group">
+        <button class="btn-icon" title="Editar"> 
+          ✏️ 
+        </button>
+        
+        <button class="btn-excluir" (click)="excluirVideo(midia.id!)" title="Excluir">
+          🗑️
+        </button>
+      </div>
+    </td>
+  </tr>
 
-          <tr *ngIf="listaDeMidias.length === 0">
-            <td colspan="4" style="text-align: center; padding: 50px; color: #8b949e;">
-              <div style="font-size: 24px; margin-bottom: 10px;">📡</div>
-              Aguardando conexão com o banco de dados da ARSAL...
-            </td>
-          </tr>
-        </tbody>
+  <tr *ngIf="listaDeMidias.length === 0">
+    <td colspan="4" class="empty-state">
+      <div class="empty-icon">📡</div>
+      Aguardando conexão com o banco de dados da ARSAL...
+    </td>
+  </tr>
+</tbody>
+        
       </table>
     </div>
   </div>

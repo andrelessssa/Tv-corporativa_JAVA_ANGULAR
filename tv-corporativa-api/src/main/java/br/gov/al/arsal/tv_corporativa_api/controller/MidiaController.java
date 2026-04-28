@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/midias")
+
 @CrossOrigin(origins = "*")
 public class MidiaController {
 
@@ -26,6 +27,11 @@ public class MidiaController {
     public ResponseEntity<List<MidiaDTO>> listar(){
         List<MidiaDTO> lista = midiaService.listarMidias();
         return ResponseEntity.ok(lista);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarVideo(@PathVariable Long id) {
+        midiaService.deletarVideo(id);
+        return ResponseEntity.noContent().build();
     }
 }
 
