@@ -1,0 +1,18 @@
+# Ignorar configurações do banco de dados (Senhas)
+**/application.properties
+**/application.yml
+
+# Ignorar pastas do Angular
+/node_modules/
+/dist/
+/.angular/
+
+# Ignorar arquivos do Sistema e IDE
+.DS_Store
+.idea/
+.vscode/
+*.class
+**/application.properties
+/node_modules/
+.DS_Store
+
