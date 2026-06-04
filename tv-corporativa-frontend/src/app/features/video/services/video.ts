@@ -40,4 +40,7 @@ export class VideoService {
   buscarTotalMidias(): Observable<number> {
     return this.http.get<number>(`${this.API}/total`);
   }
+  editarMidia(id: number, midia: MidiaDTO): Observable<void> {
+    return this.http.put<void>(`${this.API}/${id}`, midia);
+  }
 }

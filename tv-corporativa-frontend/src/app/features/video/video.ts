@@ -12,8 +12,8 @@ import { MidiaDTO, VideoService } from './services/video';
 export class Video implements OnInit {
   
   listaDeMidias: MidiaDTO[] = [];
-  
-    exibirFormulario: boolean = false; 
+  exibirFormulario: boolean = false; 
+  midiaSelecionada: MidiaDTO | null = null;
 
   constructor(private videoService: VideoService) {}
 
@@ -21,23 +21,22 @@ export class Video implements OnInit {
     this.carregarMidias();
   }
 
-  // 2. CRIAR A FUNÇÃO QUE O HTML ESTÁ CHAMANDO!
-enviarDados(nome: string, url: string, duracao: any) {
-  const novaMidia: MidiaDTO = {
-    nome: nome,
-    url: url,
-    duracaoSegundos: Number(duracao)
-  };
+  enviarDados(nome: string, url: string, duracao: any) {
+    const novaMidia: MidiaDTO = {
+      nome: nome,
+      url: url,
+      duracaoSegundos: Number(duracao)
+    };
 
-  this.videoService.salvar(novaMidia).subscribe({
-    next: (res) => {
-      console.log('Gravado no Postgres com sucesso! 🎯');
-      this.exibirFormulario = false;
-      this.carregarMidias();
-    },
-    error: (err) => console.error('Erro ao salvar:', err)
-  });
-}
+    this.videoService.salvar(novaMidia).subscribe({
+      next: (res) => {
+        console.log('Gravado no Postgres com sucesso! 🎯');
+        this.exibirFormulario = false;
+        this.carregarMidias();
+      },
+      error: (err) => console.error('Erro ao salvar:', err)
+    });
+  }
 
   carregarMidias(): void {
     this.videoService.listar().subscribe({
@@ -45,6 +44,7 @@ enviarDados(nome: string, url: string, duracao: any) {
       error: (err) => console.error(err)
     });
   }
+
   excluirVideo(id: number): void {
     if (confirm('Tem certeza que deseja excluir este vídeo?')) {
       this.videoService.excluirVideo(id).subscribe({
@@ -57,6 +57,31 @@ enviarDados(nome: string, url: string, duracao: any) {
     }
   }
 
+  prepararEdicao(midia: MidiaDTO): void {
+    this.midiaSelecionada = { ...midia };
+    this.exibirFormulario = true;
+    console.log('Preparando edição para:', this.midiaSelecionada);
+  }
 
+  // 
+  salvarEdicao(nome: string, url: string, duracao: any): void {
+    if (this.midiaSelecionada?.id) {
+      const midiaAtualizada: MidiaDTO = {
+        id: this.midiaSelecionada.id, // Mantém o ID original do banco 🆔
+        nome: nome,
+        url: url,
+        duracaoSegundos: Number(duracao)
+      };
 
+      this.videoService.editarMidia(this.midiaSelecionada.id, midiaAtualizada).subscribe({
+        next: () => {
+          console.log('Mídia editada no Postgres! ✏️🎯');
+          this.exibirFormulario = false; // Fecha o modal
+          this.midiaSelecionada = null;  // Limpa a memória
+          this.carregarMidias();         // Atualiza a tela
+        },
+        error: (err) => console.error('Erro ao editar:', err)
+      });
+    }
+  }
 }

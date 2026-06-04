@@ -6,45 +6,55 @@
       <p>Gerencie a grade de transmissão da TV Corporativa ARSAL</p>
     </div>
     
-    <button class="btn-add" (click)="exibirFormulario = true">
-  <span class="plus-icon">+</span>
-  Novo Vídeo
-</button>
+    <button class="btn-add" (click)="exibirFormulario = true; midiaSelecionada = null">
+      <span class="plus-icon">+</span>
+      Novo Vídeo
+    </button>
   </div>
 
-  <div class="modal-overlay" *ngIf="exibirFormulario" (click)="exibirFormulario = false">
+  <div class="modal-overlay" *ngIf="exibirFormulario" (click)="exibirFormulario = false; midiaSelecionada = null">
     
     <div class="modal-card" (click)="$event.stopPropagation()">
       
       <div class="modal-header">
-        <h3>🎬 Cadastrar Novo Conteúdo</h3>
-        <button class="btn-close" (click)="exibirFormulario = false">×</button>
+        <h3>
+          {{ midiaSelecionada ? '✏️ Editar Conteúdo' : '🎬 Cadastrar Novo Conteúdo' }}
+        </h3>
+        <button class="btn-close" (click)="exibirFormulario = false; midiaSelecionada = null">×</button>
       </div>
 
       <div class="modal-body">
         <div class="input-group">
           <label>NOME DO ARQUIVO</label>
-          <input type="text" #nome class="arsal-input" placeholder="Ex: Campanha Arsal 2024">
+          <input type="text" #nome class="arsal-input" 
+                 [value]="midiaSelecionada ? midiaSelecionada.nome : ''" 
+                 placeholder="Ex: Campanha Arsal 2024">
         </div>
 
         <div class="input-group">
           <label>DURAÇÃO (SEGUNDOS)</label>
-          <input type="number" #duracao class="arsal-input" value="30">
+          <input type="number" #duracao class="arsal-input" 
+                 [value]="midiaSelecionada ? midiaSelecionada.duracaoSegundos : '30'">
         </div>
 
         <div class="input-group full-width">
           <label>URL DO VÍDEO (LINK OU CAMINHO DE REDE)</label>
-          <input type="text" #url class="arsal-input" placeholder="Ex: http://servidor/video.mp4">
+          <input type="text" #url class="arsal-input" 
+                 [value]="midiaSelecionada ? midiaSelecionada.url : ''" 
+                 placeholder="Ex: http://servidor/video.mp4">
         </div>
       </div>
 
       <div class="modal-footer">
-       <div class="modal-footer">
-        <button class="btn-cancel" (click)="exibirFormulario = false">Cancelar</button>
-        <button class="btn-save" (click)="enviarDados(nome.value, url.value, duracao.value)">
-          💾 Salvar 
+        <button class="btn-cancel" (click)="exibirFormulario = false; midiaSelecionada = null">Cancelar</button>
+        
+        <button *ngIf="!midiaSelecionada" class="btn-save" (click)="enviarDados(nome.value, url.value, duracao.value)">
+          💾 Salvar Novo
         </button>
-      </div>
+
+        <button *ngIf="midiaSelecionada" class="btn-save" (click)="salvarEdicao(nome.value, url.value, duracao.value)">
+          ⚙️ Alterar Dados
+        </button>
       </div>
     </div>
   </div>
@@ -61,42 +71,36 @@
           </tr>
         </thead>
         <tbody>
-  <tr *ngFor="let midia of listaDeMidias">
-    <td>
-      <div class="file-info">
-        <span class="file-icon">🎬</span>
-        <div>
-          <p class="file-name">{{ midia.nome }}</p>
-          <p class="file-meta">URL: {{ midia.url }}</p>
-        </div>
-      </div>
-    </td>
+          <tr *ngFor="let midia of listaDeMidias">
+            <td>
+              <div class="file-info">
+                <span class="file-icon">🎬</span>
+                <div>
+                  <p class="file-name">{{ midia.nome }}</p>
+                  <p class="file-meta">URL: {{ midia.url }}</p>
+                </div>
+              </div>
+            </td>
 
-    <td>{{ midia.duracaoSegundos ? midia.duracaoSegundos + ' seg' : '--' }}</td>
+            <td>{{ midia.duracaoSegundos ? midia.duracaoSegundos + ' seg' : '--' }}</td>
 
-    <td>{{ midia.dataUpload | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ midia.dataUpload | date: 'dd/MM/yyyy HH:mm' }}</td>
 
-    <td>
-      <div class="action-group">
-        <button class="btn-icon" title="Editar"> 
-          ✏️ 
-        </button>
-        
-        <button class="btn-excluir" (click)="excluirVideo(midia.id!)" title="Excluir">
-          🗑️
-        </button>
-      </div>
-    </td>
-  </tr>
+            <td>
+              <div class="action-group">
+                <button class="btn-icon" title="Editar" (click)="prepararEdicao(midia)"> ✏️ </button>
+                <button class="btn-excluir" (click)="excluirVideo(midia.id!)" title="Excluir"> 🗑️ </button>
+              </div>
+            </td>
+          </tr>
 
-  <tr *ngIf="listaDeMidias.length === 0">
-    <td colspan="4" class="empty-state">
-      <div class="empty-icon">📡</div>
-      Aguardando conexão com o banco de dados da ARSAL...
-    </td>
-  </tr>
-</tbody>
-        
+          <tr *ngIf="listaDeMidias.length === 0">
+            <td colspan="4" class="empty-state">
+              <div class="empty-icon">📡</div>
+              Aguardando conexão com o banco de dados da ARSAL...
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>
