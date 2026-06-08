@@ -1,8 +1,15 @@
 package br.gov.al.arsal.tv_corporativa_api.controller;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,30 +19,64 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.gov.al.arsal.tv_corporativa_api.dto.MidiaDTO;
 import br.gov.al.arsal.tv_corporativa_api.service.MidiaService;
 
 @RestController
 @RequestMapping("api/midias")
-
 @CrossOrigin(origins = "*")
 public class MidiaController {
 
     @Autowired
     private MidiaService midiaService;
 
-    @PostMapping
-    public ResponseEntity<MidiaDTO> salvar(@RequestBody MidiaDTO midiaDTO) {
-        MidiaDTO midiaSalva = midiaService.salvarMidia(midiaDTO);
+    // Injeta o mesmo caminho da pasta de mídias para sabermos de onde ler os vídeos
+    @Value("${arsal.upload.diretorio}")
+    private String diretorioUpload;
+
+    // 🌟 1. NOVO SALVAR: Agora aceita o arquivo de vídeo (.mp4) vindo do formulário
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MidiaDTO> salvar(
+            @RequestParam("nome") String nome,
+            @RequestParam("duracaoSegundos") Integer duracaoSegundos,
+            @RequestParam("arquivo") MultipartFile arquivo) {
+        
+        MidiaDTO midiaSalva = midiaService.salvarMidiaComArquivo(nome, duracaoSegundos, arquivo);
         return ResponseEntity.status(201).body(midiaSalva);
     }
+
+    // 🌟 2. ROTA DE STREAMING: Serve o arquivo de vídeo físico para a TV em tempo real!
+    @GetMapping("/stream/{nomeArquivo}")
+    public ResponseEntity<Resource> transmitirVideo(@PathVariable String nomeArquivo) {
+        try {
+            // Localiza o arquivo na pasta física do servidor
+            Path caminhoArquivo = Paths.get(diretorioUpload).resolve(nomeArquivo);
+            Resource recurso = new UrlResource(caminhoArquivo.toUri());
+
+            if (recurso.exists() || recurso.isReadable()) {
+                // Retorna o arquivo com o tipo correto para o navegador dar "Play" no vídeo
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType("video/mp4"))
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + recurso.getFilename() + "\"")
+                        .body(recurso);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<MidiaDTO>> listar(){
         List<MidiaDTO> lista = midiaService.listarMidias();
         return ResponseEntity.ok(lista);
     }
+
     @GetMapping("/total")
     public ResponseEntity<Long> contarMidias() {
         long total = midiaService.contarMidias();
@@ -47,12 +88,10 @@ public class MidiaController {
         midiaService.deletarVideo(id);
         return ResponseEntity.noContent().build();
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<Void> editarMidia(@PathVariable Long id, @RequestBody MidiaDTO midiaDTO) {
         midiaService.editarMidia(id, midiaDTO);
         return ResponseEntity.noContent().build();  
     }
-
 }
-
-
