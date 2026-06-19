@@ -26,8 +26,8 @@ export class VideoService {
     return this.http.get<MidiaDTO[]>(this.API);
   }
 
-  salvar(midia: MidiaDTO): Observable<MidiaDTO> {
-    return this.http.post<MidiaDTO>(this.API, midia);
+  salvar(formData: FormData): Observable<any> {
+    return this.http.post(`${this.API}/upload`, formData);
   }
   excluirVideo(id: number): Observable<void> {
     return this.http.delete<void>(`${this.API}/${id}`);

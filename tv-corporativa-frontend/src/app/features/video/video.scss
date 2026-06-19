@@ -101,6 +101,21 @@
     align-items: center;
     z-index: 99999;
   }
+  .arsal-input::file-selector-button {
+  background-color: #7c3aed; /* Roxo padrão do seu botão Novo Vídeo 💜 */
+  color: #ffffff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 12px;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background-color: #6d28d9; /* Roxo um pouco mais escuro no hover 🦅 */
+  }
+}
 
   .btn-excluir {
     background: #21262d;

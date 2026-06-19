@@ -4,6 +4,7 @@ import { Sidebar } from './shared/components/sidebar/sidebar';
 import { Dashboard } from './features/dashboard/dashboard'; 
 import { Video } from './features/video/video';
 import { Dispositivos } from './features/dispositivos/dispositivos';
+import { Midia } from './components/midia/midia';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +16,8 @@ import { Dispositivos } from './features/dispositivos/dispositivos';
     Sidebar, 
     Dashboard,
     Video,
-    Dispositivos], 
+    Dispositivos,
+    Midia], 
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
 })
