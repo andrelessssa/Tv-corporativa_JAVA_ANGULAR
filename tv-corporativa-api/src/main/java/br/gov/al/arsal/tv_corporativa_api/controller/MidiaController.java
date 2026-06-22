@@ -34,22 +34,23 @@ public class MidiaController {
     @Autowired
     private MidiaService midiaService;
 
-    // Injeta o mesmo caminho da pasta de mídias para sabermos de onde ler os vídeos
+    // Injeta o caminho da pasta de mídias (configurado no application.properties)
     @Value("${arsal.upload.diretorio}")
     private String diretorioUpload;
 
-    // 🌟 1. NOVO SALVAR: Agora aceita o arquivo de vídeo (.mp4) vindo do formulário
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // 🌟 ROTA CORRIGIDA: Agora mapeia exatamente /api/midias/upload e aceita o arquivo binário
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MidiaDTO> salvar(
             @RequestParam("nome") String nome,
             @RequestParam("duracaoSegundos") Integer duracaoSegundos,
             @RequestParam("arquivo") MultipartFile arquivo) {
         
+        // Dispara o serviço para salvar o vídeo físico em C:/arsal_midias/ e registrar no Postgres
         MidiaDTO midiaSalva = midiaService.salvarMidiaComArquivo(nome, duracaoSegundos, arquivo);
         return ResponseEntity.status(201).body(midiaSalva);
     }
 
-    // 🌟 2. ROTA DE STREAMING: Serve o arquivo de vídeo físico para a TV em tempo real!
+    // 🎬 ROTA DE STREAMING: Serve o arquivo de vídeo físico para a TV em tempo real!
     @GetMapping("/stream/{nomeArquivo}")
     public ResponseEntity<Resource> transmitirVideo(@PathVariable String nomeArquivo) {
         try {
@@ -58,7 +59,7 @@ public class MidiaController {
             Resource recurso = new UrlResource(caminhoArquivo.toUri());
 
             if (recurso.exists() || recurso.isReadable()) {
-                // Retorna o arquivo com o tipo correto para o navegador dar "Play" no vídeo
+                // Retorna o arquivo com o tipo correto para o navegador dar "Play" no vídeo de forma fluida
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType("video/mp4"))
                         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + recurso.getFilename() + "\"")

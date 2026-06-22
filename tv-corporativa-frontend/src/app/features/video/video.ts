@@ -15,7 +15,7 @@ export class Video implements OnInit {
   exibirFormulario: boolean = false; 
   midiaSelecionada: MidiaDTO | null = null;
 
-  // 🌟 LINHA NOVA 1: Cria a caixinha na memória para segurar o arquivo .mp4 do modal
+  // 📦 Caixinha na memória para segurar o arquivo de vídeo .mp4
   arquivoSelecionado: File | null = null;
 
   constructor(private videoService: VideoService) {}
@@ -24,7 +24,7 @@ export class Video implements OnInit {
     this.carregarMidias();
   }
 
-  // 🌟 LINHA NOVA 2: Função que captura o arquivo quando o usuário escolhe no modal
+  // 🎬 Captura o arquivo físico quando o usuário escolhe no explorador de arquivos
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -33,31 +33,31 @@ export class Video implements OnInit {
     }
   }
 
-  // 🌟 ALTERADO: Agora recebe apenas nome e duracao, pois a URL quem gera é o Java!
+  // 🚀 Envia o pacote completo (Multipart) para o Spring Boot
   enviarDados(nome: string, duracao: any) {
     if (!this.arquivoSelecionado) {
       alert('Por favor, selecione um arquivo de vídeo .mp4 antes de salvar! 🚫');
       return;
     }
 
-    // 1. Criamos a caixa de papelão Multipart (FormData)
+    // 1. Criamos o contêiner FormData (Multipart)
     const formData = new FormData();
     
-    // 2. Colocamos o arquivo físico e os textos dentro dela
-    // ATENÇÃO: Esses nomes têm que bater idênticos com o @RequestParam do seu Controller no Java!
-    formData.append('file', this.arquivoSelecionado);
+    // 2. Inserimos as chaves de texto e o binário do arquivo
+    // 🌟 AJUSTADO: 'arquivo' batendo idêntico com o @RequestParam do Java!
+    formData.append('arquivo', this.arquivoSelecionado);
     formData.append('nome', nome);
     formData.append('duracaoSegundos', String(duracao));
 
     console.log('Enviando pacote completo para o Java na ARSAL...');
 
-    // 3. Chamamos o serviço passando o nosso formData completo
+    // 3. Dispara o serviço passando o formData
     this.videoService.salvar(formData).subscribe({
       next: (res) => {
-        console.log('Vídeo gravado e salvo na pasta C:/arsal_midias/ com sucesso! 🎯🎉');
+        console.log('Vídeo gravado e salvo com sucesso! 🎯🎉');
         this.exibirFormulario = false;
-        this.arquivoSelecionado = null; // Limpa a caixinha para o próximo upload
-        this.carregarMidias();
+        this.arquivoSelecionado = null; // Limpa a caixinha do arquivo para o próximo upload
+        this.carregarMidias(); // Recarrega a tabela de mídias na tela
       },
       error: (err) => console.error('Erro ao fazer upload da mídia:', err)
     });
@@ -88,13 +88,13 @@ export class Video implements OnInit {
     console.log('Preparando edição para:', this.midiaSelecionada);
   }
 
-  // Mantido para alterar apenas os dados cadastrais se necessário
+  // Altera apenas os dados cadastrais (Nome e Duração) se necessário
   salvarEdicao(nome: string, duracao: any): void {
     if (this.midiaSelecionada?.id) {
       const midiaAtualizada: MidiaDTO = {
         id: this.midiaSelecionada.id,
         nome: nome,
-        url: this.midiaSelecionada.url, // Mantém a URL do arquivo que já existe
+        url: this.midiaSelecionada.url, // Mantém a URL do streaming do arquivo já existente
         duracaoSegundos: Number(duracao)
       };
 
