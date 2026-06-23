@@ -1,1 +1,18 @@
-<p>login works!</p>
+<div class="login-container">
+  <div class="login-card">
+    <h2>📺 TV Corporativa ARSAL</h2>
+    <p>Introduza as credenciais de acesso</p>
+
+    <div class="input-group">
+      <label>Utilizador</label>
+      <input type="text" [(ngModel)]="usuario" placeholder="Ex: admin ou tv">
+    </div>
+
+    <div class="input-group">
+      <label>Senha</label>
+      <input type="password" [(ngModel)]="senha" placeholder="••••••••">
+    </div>
+
+    <button (click)="fazerLogin()">Entrar no Sistema 🚀</button>
+  </div>
+</div>

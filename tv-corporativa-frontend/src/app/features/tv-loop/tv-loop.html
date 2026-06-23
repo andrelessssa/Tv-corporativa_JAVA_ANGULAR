@@ -1,0 +1,17 @@
+<div class="tv-container">
+  <video 
+    *ngIf="videoUrlAtual"
+    #videoPlayer
+    [src]="videoUrlAtual"
+    (ended)="proximoVideo()"
+    autoplay
+    muted
+    controls="false"
+    class="fullscreen-video">
+  </video>
+
+  <div *ngIf="!videoUrlAtual" class="carregando">
+    <div class="spinner"></div>
+    <h2>Buscando playlist da TV ARSAL... 📡</h2>
+  </div>
+</div>

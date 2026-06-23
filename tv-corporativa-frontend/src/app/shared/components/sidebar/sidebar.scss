@@ -35,6 +35,23 @@
       -webkit-text-fill-color: transparent;
     }
   }
+  .btn-logout {
+  background-color: #7c3aed;  
+  color: #ffffff;
+  border: none;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  width: 80%;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background-color: #7c3aed;  /* Vermelho mais escuro no hover */
+  }
+}
 
   .nav-label {
     font-size: 10px;
