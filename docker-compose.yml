@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # 💾 1. Banco de Dados Postgres da ARSAL
   postgres-db:
@@ -16,7 +14,7 @@ services:
 
   # ☕ 2. Backend Spring Boot (Java)
   api-server:
-    build: ./tv-corporativa-api
+    build: ./tv-corporativa-api  # 👈 Foca o Docker direto dentro da pasta do print!
     container_name: arsal-api
     ports:
       - "8080:8080"
@@ -26,15 +24,17 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/tv_corporativa
       - SPRING_DATASOURCE_USERNAME=andre
       - SPRING_DATASOURCE_PASSWORD=arsal@password
-
   # 📺 3. Frontend Angular (Nginx)
   web-tv:
-    build: ./tv-corporativa-frontend
+    build:
+      context: .
+      dockerfile: ./tv-corporativa-frontend/Dockerfile
     container_name: arsal-front
     ports:
-      - "80:80" # Vai rodar direto na porta padrão da web!
+      - "80:80"
     depends_on:
       - api-server
 
+# 📦 CORRIGIDO: Esta seção declara formalmente o volume para o Postgres não perder os dados
 volumes:
   postgres_data:
