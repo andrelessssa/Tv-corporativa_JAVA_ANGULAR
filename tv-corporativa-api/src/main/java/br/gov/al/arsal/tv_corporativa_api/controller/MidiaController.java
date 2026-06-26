@@ -26,9 +26,11 @@ import org.springframework.web.multipart.MultipartFile;
 import br.gov.al.arsal.tv_corporativa_api.dto.MidiaDTO;
 import br.gov.al.arsal.tv_corporativa_api.service.MidiaService;
 
+
+
 @RestController
-@RequestMapping("api/midias")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/midias")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MidiaController {
 
     @Autowired
@@ -51,7 +53,7 @@ public class MidiaController {
     }
 
     // 🎬 ROTA DE STREAMING: Serve o arquivo de vídeo físico para a TV em tempo real!
-    @GetMapping("/stream/{nomeArquivo}")
+    @GetMapping("/stream/{nomeArquivo:.+}")
     public ResponseEntity<Resource> transmitirVideo(@PathVariable String nomeArquivo) {
         try {
             // Localiza o arquivo na pasta física do servidor

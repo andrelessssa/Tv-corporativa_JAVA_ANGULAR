@@ -2,13 +2,16 @@ package br.gov.al.arsal.tv_corporativa_api.dto;
 
 import java.time.LocalDateTime;
 
-import br.gov.al.arsal.tv_corporativa_api.model.Midia;
 
-public record MidiaDTO(Long id, String nome,  String url, Integer duracaoSegundos, LocalDateTime dataUpload) {
 
-    public MidiaDTO(Midia midia) {
-        this(midia.getId(), midia.getNome(),  midia.getUrl(), midia.getDuracaoSegundos(), midia.getDataUpload());
-    }
-
+public record MidiaDTO(Long id, String nome, String url, Integer duracaoSegundos, LocalDateTime dataUpload) {
+    
+    public MidiaDTO(Long id, String nome, String url, Integer duracaoSegundos, LocalDateTime dataUpload) {
+    this.id = id;
+    this.nome = nome;
+    this.url = url;
+    this.duracaoSegundos = duracaoSegundos;
+    this.dataUpload = dataUpload;
+}
 
 }

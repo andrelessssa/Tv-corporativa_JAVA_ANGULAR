@@ -14,7 +14,7 @@ services:
 
   # ☕ 2. Backend Spring Boot (Java)
   api-server:
-    build: ./tv-corporativa-api  # 👈 Foca o Docker direto dentro da pasta do print!
+    build: ./tv-corporativa-api
     container_name: arsal-api
     ports:
       - "8080:8080"
@@ -24,6 +24,10 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/tv_corporativa
       - SPRING_DATASOURCE_USERNAME=andre
       - SPRING_DATASOURCE_PASSWORD=arsal@password
+    # 🎯 PONTE DE VÍDEOS ADICIONADA: Salva o arquivo no seu Windows físico!
+    volumes:
+      - C:/arsal_midias:/app/arsal_midias
+
   # 📺 3. Frontend Angular (Nginx)
   web-tv:
     build:
@@ -35,6 +39,6 @@ services:
     depends_on:
       - api-server
 
-# 📦 CORRIGIDO: Esta seção declara formalmente o volume para o Postgres não perder os dados
+# 📦 Volumes declarados para o Postgres não perder os dados
 volumes:
   postgres_data:

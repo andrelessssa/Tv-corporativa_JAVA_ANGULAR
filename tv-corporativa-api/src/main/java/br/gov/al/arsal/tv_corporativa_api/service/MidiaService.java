@@ -1,15 +1,15 @@
 package br.gov.al.arsal.tv_corporativa_api.service;
 
 import java.nio.file.Files;
-import java.nio.file.Path; // 🌟 IMPORT CORRIGIDO: java.nio.file.Path no lugar do jakarta
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value; // 🌟 Import necessário para ler o properties
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,46 +23,68 @@ public class MidiaService {
     @Autowired
     private MidiaRepository midiaRepository;
 
-    // 🌟 VARIÁVEL ADICIONADA: Busca o caminho 'C:/arsal_midias/' configurado no application.properties
     @Value("${arsal.upload.diretorio}")
     private String diretorioUpload;
 
     public MidiaDTO salvarMidiaComArquivo(String nome, Integer duracao, MultipartFile arquivo) {
         try {
-            // 1. Cria a pasta física no servidor se ela não existir
             Path pasta = Paths.get(diretorioUpload);
             if (!Files.exists(pasta)) {
                 Files.createDirectories(pasta);
             }
 
-            // 2. Gera um nome único para o arquivo não sobrescrever outro
             String nomeOriginal = arquivo.getOriginalFilename();
             String nomeUnico = UUID.randomUUID().toString() + "_" + nomeOriginal;
-            
-            // 3. Copia o arquivo recebido para dentro da pasta do servidor
             Path caminhoCompleto = pasta.resolve(nomeUnico);
-            Files.copy(arquivo.getInputStream(), caminhoCompleto, StandardCopyOption.REPLACE_EXISTING);
 
-            // 4. Monta a URL de streaming (Aponta para o próprio servidor Java)
-            String urlDoVideo = "http://localhost:8080/api/midias/stream/" + nomeUnico;
+            // 🎯 FORÇA A GRAVAÇÃO DO BUFFER ATÉ O FIM DO FLUXO:
+            try (java.io.InputStream is = arquivo.getInputStream()) {
+                Files.copy(is, caminhoCompleto, StandardCopyOption.REPLACE_EXISTING);
+            }
 
-            // 5. Salva as informações textuais no banco Postgres
+            // 🎯 VALIDAÇÃO DE INTEGRIDADE: Garante que o arquivo foi escrito e não está vazio
+            if (!Files.exists(caminhoCompleto) || Files.size(caminhoCompleto) == 0) {
+                throw new RuntimeException("Falha catastrófica: O arquivo de mídia foi gravado com 0 bytes no servidor.");
+            }
+
+            // 🎯 Substitua pelo IP real da sua máquina na rede interna da ARSAL
+            String urlDoVideo = "http://192.168.1.104:8080/api/midias/stream/" + nomeUnico;
+
             Midia midia = new Midia();
             midia.setNome(nome);
             midia.setDuracaoSegundos(duracao);
             midia.setUrl(urlDoVideo);
+            midia.setDataUpload(LocalDateTime.now());
 
-            return new MidiaDTO(midiaRepository.save(midia));
+            Midia midiaSalva = midiaRepository.save(midia);
+
+            return new MidiaDTO(
+                midiaSalva.getId(),
+                midiaSalva.getNome(),
+                midiaSalva.getUrl(),
+                midiaSalva.getDuracaoSegundos(),
+                midiaSalva.getDataUpload()
+            );
 
         } catch (Exception e) {
             throw new RuntimeException("Erro ao salvar o arquivo de vídeo no servidor: " + e.getMessage());
         }
     }
 
+       
+    
+
     public List<MidiaDTO> listarMidias() {
         List<Midia> midiasNoBanco = midiaRepository.findAll();
+        // 🎯 Perfeito para Record: Construtor posicional para cada item da lista
         return midiasNoBanco.stream()
-                .map(m -> new MidiaDTO(m))
+                .map(m -> new MidiaDTO(
+                    m.getId(),
+                    m.getNome(),
+                    m.getUrl(),
+                    m.getDuracaoSegundos(),
+                    m.getDataUpload()
+                ))
                 .toList();
     }
 
@@ -79,7 +101,10 @@ public class MidiaService {
     public void editarMidia(Long id, MidiaDTO midiaDTO) {
         Midia midia = midiaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mídia não encontrada com ID: " + id));
-        BeanUtils.copyProperties(midiaDTO, midia);
+        
+        // 🎯 CORREÇÃO EXATA PARA RECORD: Records usam .nome() e .duracaoSegundos() sem o prefixo "get"
+        midia.setNome(midiaDTO.nome());
+        midia.setDuracaoSegundos(midiaDTO.duracaoSegundos());
         midiaRepository.save(midia);
     }
 }

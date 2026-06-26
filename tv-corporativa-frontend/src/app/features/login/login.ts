@@ -16,10 +16,10 @@ export class LoginComponent {
 
   constructor(private router: Router) {}
 
-fazerLogin() {
+efetuarLogin() {
   if (this.usuario === 'admin' && this.senha === 'arsal@123') {
     localStorage.setItem('perfilUser', 'ADMIN');
-    this.router.navigate(['/videos']); // 👈 Alterado de 'gestao' para 'videos'!
+    this.router.navigate(['/videos']);
   } 
   else if (this.usuario === 'tv' && this.senha === 'tv@123') {
     localStorage.setItem('perfilUser', 'TV');
@@ -28,5 +28,6 @@ fazerLogin() {
   else {
     alert('Credenciais incorretas! 🚫');
   }
+}
  
-}}
+}

@@ -51,7 +51,7 @@ export class TvLoopComponent implements OnInit {
           console.log('Aguardando interação do usuário ou autoplay liberado:', err);
         });
       }
-    }, 100);
+    }, 300); // 300ms de delay para garantir que a URL foi atualizada
   }
 
   // 🔄 MÁGICA DO LOOP: Disparado automaticamente quando o vídeo ativo termina!
