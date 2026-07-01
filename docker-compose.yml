@@ -17,7 +17,7 @@ services:
     build: ./tv-corporativa-api
     container_name: arsal-api
     ports:
-      - "0.0.0.0:8080:8080"
+      - "0.0.0.0:8085:8080" # 🎯 MUDOU AQUI! A rede acessa pela 8085 e o Docker joga para a 8080 interna do Java
     depends_on:
       - postgres-db
     environment:

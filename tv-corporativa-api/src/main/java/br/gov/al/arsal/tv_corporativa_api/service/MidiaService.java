@@ -48,7 +48,7 @@ public class MidiaService {
             }
 
             // 🎯 Substitua pelo IP real da sua máquina na rede interna da ARSAL
-            String urlDoVideo = "http://192.168.1.104:8080/api/midias/stream/" + nomeUnico;
+            String urlDoVideo = "http://192.168.1.157:8085/api/midias/stream/" + nomeUnico;
 
             Midia midia = new Midia();
             midia.setNome(nome);
