@@ -1,5 +1,10 @@
 package br.gov.al.arsal.tv_corporativa_api.service;
 
+import java.io.File; // 📁 IMPORTAÇÃO CORRIGIDA!
+import java.nio.file.Files; // 📁 IMPORTAÇÃO CORRIGIDA!
+import java.nio.file.Path; // 📁 IMPORTAÇÃO CORRIGIDA!
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -13,41 +18,36 @@ import br.gov.al.arsal.tv_corporativa_api.dto.MidiaDTO;
 import br.gov.al.arsal.tv_corporativa_api.model.Midia;
 import br.gov.al.arsal.tv_corporativa_api.repository.MidiaRepository;
 
-// 🪣 Importações do MinIO
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-
 @Service
 public class MidiaService {
 
     @Autowired
     private MidiaRepository midiaRepository;
 
-    @Autowired
-    private MinioClient minioClient;
-
-    @Value("${MINIO_BUCKET:tv-midias}")
-    private String nomeBucket;
+    @Value("${arsal.upload.diretorio}")
+    private String diretorioUpload;
+    
+    private final String PASTA_UPLOADS = "/app/uploads"; // Pasta dentro do contêiner Linux
 
     public MidiaDTO salvarMidiaComArquivo(String nome, Integer duracao, MultipartFile arquivo) {
         try {
             String nomeOriginal = arquivo.getOriginalFilename();
             String nomeUnico = UUID.randomUUID().toString() + "_" + nomeOriginal;
 
-            // 🚀 Envia o stream direto para o balde do MinIO
-            try (java.io.InputStream is = arquivo.getInputStream()) {
-                minioClient.putObject(
-                    PutObjectArgs.builder()
-                        .bucket(nomeBucket)
-                        .object(nomeUnico)
-                        .stream(is, arquivo.getSize(), -1)
-                        .contentType(arquivo.getContentType())
-                        .build()
-                );
+            // 📁 Garante que a pasta de uploads exista no disco
+            File diretorio = new File(PASTA_UPLOADS);
+            if (!diretorio.exists()) {
+                diretorio.mkdirs();
             }
 
-            // 🎯 O link do streaming agora aponta para a porta do MinIO
-            String urlDoVideo = "http://192.168.1.148:9001/" + nomeBucket + "/" + nomeUnico;
+            // 🚀 Salva o arquivo fisicamente no disco do servidor
+            Path caminhoDestino = Paths.get(PASTA_UPLOADS).resolve(nomeUnico);
+            try (java.io.InputStream is = arquivo.getInputStream()) {
+                Files.copy(is, caminhoDestino, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            // 🎯 O link agora vai apontar direto para a própria API na porta 8080!
+            String urlDoVideo = "http://192.168.1.148:8080/uploads/" + nomeUnico;
 
             Midia midia = new Midia();
             midia.setNome(nome);
@@ -65,7 +65,7 @@ public class MidiaService {
                     midiaSalva.getDataUpload());
 
         } catch (Exception e) {
-            throw new RuntimeException("Erro catastrófico ao realizar upload para o MinIO: " + e.getMessage());
+            throw new RuntimeException("Erro ao realizar upload para o disco local: " + e.getMessage());
         }
     }
 
@@ -81,8 +81,6 @@ public class MidiaService {
                 .toList();
     }
 
-
-
     public void deletarVideo(Long id) {
         Midia midia = midiaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mídia não encontrada com ID: " + id));
@@ -97,8 +95,7 @@ public class MidiaService {
         Midia midia = midiaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mídia não encontrada com ID: " + id));
 
-        // 🎯 CORREÇÃO EXATA PARA RECORD: Records usam .nome() e .duracaoSegundos() sem
-        // o prefixo "get"
+        // 🎯 Usando os métodos nativos do Record
         midia.setNome(midiaDTO.nome());
         midia.setDuracaoSegundos(midiaDTO.duracaoSegundos());
         midiaRepository.save(midia);

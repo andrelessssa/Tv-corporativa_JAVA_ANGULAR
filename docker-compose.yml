@@ -12,21 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # 🪣 2. Servidor de Armazenamento de Objetos MinIO
-  minio:
-    image: minio/minio
-    container_name: arsal-minio
-    ports:
-      - "9000:9000"       # Porta da API (Onde o Java envia os vídeos)
-      - "9001:9001"       # Porta do Console Web (Gerenciamento)
-    environment:
-      MINIO_ROOT_USER: andreminio
-      MINIO_ROOT_PASSWORD: arsalminiopassword
-    command: server /data --console-address ":9001"
-    volumes:
-      - minio_data:/data
-
-  # ☕ 3. Backend Spring Boot (Java) -> 🎯 ALINHADO CORRETAMENTE E PORTEIRA ABERTA!
+  # ☕ 2. Backend Spring Boot (Java) - Sem MinIO e com volume de mídia local!
   api-server:
     build: ./tv-corporativa-api
     container_name: arsal-api
@@ -34,21 +20,17 @@ services:
       - "8080:8080"
     depends_on:
       - postgres-db
-      - minio
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/tv_corporativa
       - SPRING_DATASOURCE_USERNAME=andre
       - SPRING_DATASOURCE_PASSWORD=arsal@password
-      - MINIO_URL=http://minio:9000
-      # 🎯 ADICIONA OU AJUSTA A URL QUE SERÁ ENVIADA PARA O FRONTEND APONTANDO PARA O IP REAL:
-      - MINIO_EXTERNAL_URL=http://192.168.1.148:9000
-      - MINIO_ACCESS_KEY=andreminio
-      - MINIO_SECRET_KEY=arsalminiopassword
-      - MINIO_BUCKET=tv-midias
       - SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=2000MB
       - SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=2000MB
+    volumes:
+      # Mapeia a pasta de vídeos de dentro do contêiner para uma pasta real no HD do servidor
+      - pasta_videos:/app/uploads
 
-  # 🌐 4. Frontend Angular
+  # 🌐 3. Frontend Angular
   web-tv:
     build:
       context: .
@@ -61,4 +43,4 @@ services:
 
 volumes:
   postgres_data:
-  minio_data:
+  pasta_videos: # Novo volume seguro para os vídeos
