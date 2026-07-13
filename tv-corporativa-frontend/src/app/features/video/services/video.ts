@@ -15,7 +15,7 @@ export interface MidiaDTO {
 })
 export class VideoService {
 
-  // 🔥 URL base única e correta da API
+  // 🔥 URL base única alinhada com a nova porta 8080 do Docker Compose
   private API = 'http://192.168.1.148:8080/api/midias';
 
   constructor(private http: HttpClient) { }
@@ -25,9 +25,9 @@ export class VideoService {
     return this.http.get<MidiaDTO[]>(this.API);
   }
 
-  // 📤 UPLOAD DE VÍDEO
-  salvar(formData: FormData): Observable<any> {
-    return this.http.post(`${this.API}/upload`, formData);
+  // 📤 UPLOAD DE VÍDEO (Corrigido o retorno para MidiaDTO)
+  salvar(formData: FormData): Observable<MidiaDTO> {
+    return this.http.post<MidiaDTO>(`${this.API}/upload`, formData);
   }
 
   // 🗑️ DELETAR VÍDEO
