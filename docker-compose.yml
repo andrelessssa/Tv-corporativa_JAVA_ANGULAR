@@ -27,11 +27,11 @@ services:
       - minio_data:/data
 
   # ☕ 3. Backend Spring Boot (Java) -> 🎯 AJUSTADO PARA A PORTA 8080 EXTERNA!
-  api-server:
+ api-server:
     build: ./tv-corporativa-api
     container_name: arsal-api
     ports:
-      - "8080:8080"       # 🚪 A rede acessa pela 8080 externa e o Docker manda para a 8080 do Java
+      - "8080:8080"
     depends_on:
       - postgres-db
       - minio
@@ -43,6 +43,9 @@ services:
       - MINIO_ACCESS_KEY=andreminio
       - MINIO_SECRET_KEY=arsalminiopassword
       - MINIO_BUCKET=tv-midias
+      # 🎯 FORÇA O LIMITE DE ATÉ 2 GIGABYTES DIRETO NO DOCKER:
+      - SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=2000MB
+      - SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=2000MB
 
   # 🌐 4. Frontend Angular
   web-tv:
