@@ -40,6 +40,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=andre
       - SPRING_DATASOURCE_PASSWORD=arsal@password
       - MINIO_URL=http://minio:9000
+      # 🎯 ADICIONA OU AJUSTA A URL QUE SERÁ ENVIADA PARA O FRONTEND APONTANDO PARA O IP REAL:
+      - MINIO_EXTERNAL_URL=http://192.168.1.148:9000
       - MINIO_ACCESS_KEY=andreminio
       - MINIO_SECRET_KEY=arsalminiopassword
       - MINIO_BUCKET=tv-midias
