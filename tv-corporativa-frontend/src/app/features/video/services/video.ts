@@ -16,7 +16,7 @@ export interface MidiaDTO {
 export class VideoService {
 
   // 🔥 URL base única e correta da API
-  private API = 'http://192.168.1.148:8085/api/midias';
+  private API = 'http://192.168.1.148:8080/api/midias';
 
   constructor(private http: HttpClient) { }
 
