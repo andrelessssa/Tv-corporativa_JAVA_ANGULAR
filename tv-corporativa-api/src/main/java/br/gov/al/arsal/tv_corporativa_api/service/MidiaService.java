@@ -47,7 +47,7 @@ public class MidiaService {
             }
 
             // 🎯 O link do streaming agora aponta para a porta do MinIO
-            String urlDoVideo = "http://192.168.1.148:9000/" + nomeBucket + "/" + nomeUnico;
+            String urlDoVideo = "http://192.168.1.148:9001/" + nomeBucket + "/" + nomeUnico;
 
             Midia midia = new Midia();
             midia.setNome(nome);
