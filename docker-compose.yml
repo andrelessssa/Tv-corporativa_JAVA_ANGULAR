@@ -12,24 +12,41 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # ☕ 2. Backend Spring Boot (Java)
+  # 🪣 2. Servidor de Armazenamento de Objetos MinIO (NOVO!)
+  minio:
+    image: minio/minio
+    container_name: arsal-minio
+    ports:
+      - "9000:9000"       # Porta da API (Onde o Java vai enviar os vídeos)
+      - "9001:9001"       # Porta do Console Web (Para você gerenciar os arquivos pelo navegador)
+    environment:
+      MINIO_ROOT_USER: andreminio
+      MINIO_ROOT_PASSWORD: arsalminiopassword
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+  # ☕ 3. Backend Spring Boot (Java)
   api-server:
     build: ./tv-corporativa-api
     container_name: arsal-api
     ports:
-      - "0.0.0.0:8085:8080" # 🎯 A rede acessa pela 8085 e o Docker joga para a 8080 interna do Java
+      - "0.0.0.0:8085:8080"
     depends_on:
       - postgres-db
+      - minio
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://arsal-postgres:5432/tv_corporativa
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/tv_corporativa
       - SPRING_DATASOURCE_USERNAME=andre
       - SPRING_DATASOURCE_PASSWORD=arsal@password
-      - ARSAL_UPLOAD_DIRETORIO=/app/arsal_midias/
-      - arsal.upload.diretorio=/app/arsal_midias/
-    volumes:
-      - C:/arsal_midias:/app/arsal_midias
+      # 🎯 CONFIGURAÇÕES DO MINIO PARA O JAVA:
+      - MINIO_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=andreminio
+      - MINIO_SECRET_KEY=arsalminiopassword
+      - MINIO_BUCKET=tv-midias
+    # ❌ REPAROU? NÃO PRECISA MAIS DO VOLUME C:/arsal_midias AQUI! 🎉
 
-  # 📺 3. Frontend Angular (Nginx)
+  # 🌐 4. Frontend Angular
   web-tv:
     build:
       context: .
@@ -40,6 +57,6 @@ services:
     depends_on:
       - api-server
 
-# 📦 Volumes declarados para o Postgres não perder os dados
 volumes:
   postgres_data:
+  minio_data:       # Volume para o MinIO não perder os vídeos quando reiniciar

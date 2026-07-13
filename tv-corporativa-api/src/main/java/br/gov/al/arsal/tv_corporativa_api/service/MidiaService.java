@@ -1,9 +1,5 @@
 package br.gov.al.arsal.tv_corporativa_api.service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -17,40 +13,41 @@ import br.gov.al.arsal.tv_corporativa_api.dto.MidiaDTO;
 import br.gov.al.arsal.tv_corporativa_api.model.Midia;
 import br.gov.al.arsal.tv_corporativa_api.repository.MidiaRepository;
 
+// 🪣 Importações do MinIO
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+
 @Service
 public class MidiaService {
 
     @Autowired
     private MidiaRepository midiaRepository;
 
-    @Value("${arsal.upload.diretorio}")
-    private String diretorioUpload;
+    @Autowired
+    private MinioClient minioClient;
+
+    @Value("${MINIO_BUCKET:tv-midias}")
+    private String nomeBucket;
 
     public MidiaDTO salvarMidiaComArquivo(String nome, Integer duracao, MultipartFile arquivo) {
         try {
-            Path pasta = Paths.get(diretorioUpload);
-            if (!Files.exists(pasta)) {
-                Files.createDirectories(pasta);
-            }
-
             String nomeOriginal = arquivo.getOriginalFilename();
             String nomeUnico = UUID.randomUUID().toString() + "_" + nomeOriginal;
-            Path caminhoCompleto = pasta.resolve(nomeUnico);
 
-            // 🎯 FORÇA A GRAVAÇÃO DO BUFFER ATÉ O FIM DO FLUXO:
+            // 🚀 Envia o stream direto para o balde do MinIO
             try (java.io.InputStream is = arquivo.getInputStream()) {
-                Files.copy(is, caminhoCompleto, StandardCopyOption.REPLACE_EXISTING);
+                minioClient.putObject(
+                    PutObjectArgs.builder()
+                        .bucket(nomeBucket)
+                        .object(nomeUnico)
+                        .stream(is, arquivo.getSize(), -1)
+                        .contentType(arquivo.getContentType())
+                        .build()
+                );
             }
 
-            // 🎯 VALIDAÇÃO DE INTEGRIDADE: Garante que o arquivo foi escrito e não está
-            // vazio
-            if (!Files.exists(caminhoCompleto) || Files.size(caminhoCompleto) == 0) {
-                throw new RuntimeException(
-                        "Falha catastrófica: O arquivo de mídia foi gravado com 0 bytes no servidor.");
-            }
-
-            // 🎯 Substitua pelo IP real da sua máquina na rede interna da ARSAL
-            String urlDoVideo = "http://192.168.1.148:8085/api/midias/stream/" + nomeUnico;
+            // 🎯 O link do streaming agora aponta para a porta do MinIO
+            String urlDoVideo = "http://192.168.1.148:9000/" + nomeBucket + "/" + nomeUnico;
 
             Midia midia = new Midia();
             midia.setNome(nome);
@@ -68,13 +65,12 @@ public class MidiaService {
                     midiaSalva.getDataUpload());
 
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao salvar o arquivo de vídeo no servidor: " + e.getMessage());
+            throw new RuntimeException("Erro catastrófico ao realizar upload para o MinIO: " + e.getMessage());
         }
     }
 
     public List<MidiaDTO> listarMidias() {
         List<Midia> midiasNoBanco = midiaRepository.findAll();
-        // 🎯 Perfeito para Record: Construtor posicional para cada item da lista
         return midiasNoBanco.stream()
                 .map(m -> new MidiaDTO(
                         m.getId(),
@@ -84,6 +80,8 @@ public class MidiaService {
                         m.getDataUpload()))
                 .toList();
     }
+
+
 
     public void deletarVideo(Long id) {
         Midia midia = midiaRepository.findById(id)
