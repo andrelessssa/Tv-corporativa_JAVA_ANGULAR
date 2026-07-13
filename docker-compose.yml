@@ -17,14 +17,14 @@ services:
     build: ./tv-corporativa-api
     container_name: arsal-api
     ports:
-      - "0.0.0.0:8085:8080" # 🎯 MUDOU AQUI! A rede acessa pela 8085 e o Docker joga para a 8080 interna do Java
+      - "0.0.0.0:8085:8080" # 🎯 A rede acessa pela 8085 e o Docker joga para a 8080 interna do Java
     depends_on:
       - postgres-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/tv_corporativa
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://arsal-postgres:5432/tv_corporativa
       - SPRING_DATASOURCE_USERNAME=andre
       - SPRING_DATASOURCE_PASSWORD=arsal@password
-    # 🎯 PONTE DE VÍDEOS ADICIONADA: Salva o arquivo no seu Windows físico!
+      - ARSAL_UPLOAD_DIRETORIO=/app/arsal_midias/
     volumes:
       - C:/arsal_midias:/app/arsal_midias
 
