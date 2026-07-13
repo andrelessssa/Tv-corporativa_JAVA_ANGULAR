@@ -26,8 +26,8 @@ services:
     volumes:
       - minio_data:/data
 
-  # ☕ 3. Backend Spring Boot (Java) -> 🎯 AJUSTADO PARA A PORTA 8080 EXTERNA!
- api-server:
+  # ☕ 3. Backend Spring Boot (Java) -> 🎯 ALINHADO CORRETAMENTE E PORTEIRA ABERTA!
+  api-server:
     build: ./tv-corporativa-api
     container_name: arsal-api
     ports:
@@ -43,7 +43,6 @@ services:
       - MINIO_ACCESS_KEY=andreminio
       - MINIO_SECRET_KEY=arsalminiopassword
       - MINIO_BUCKET=tv-midias
-      # 🎯 FORÇA O LIMITE DE ATÉ 2 GIGABYTES DIRETO NO DOCKER:
       - SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=2000MB
       - SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=2000MB
 
