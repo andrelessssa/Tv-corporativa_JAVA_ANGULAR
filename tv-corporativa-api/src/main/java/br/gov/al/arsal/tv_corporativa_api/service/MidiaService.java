@@ -42,13 +42,15 @@ public class MidiaService {
                 Files.copy(is, caminhoCompleto, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            // 🎯 VALIDAÇÃO DE INTEGRIDADE: Garante que o arquivo foi escrito e não está vazio
+            // 🎯 VALIDAÇÃO DE INTEGRIDADE: Garante que o arquivo foi escrito e não está
+            // vazio
             if (!Files.exists(caminhoCompleto) || Files.size(caminhoCompleto) == 0) {
-                throw new RuntimeException("Falha catastrófica: O arquivo de mídia foi gravado com 0 bytes no servidor.");
+                throw new RuntimeException(
+                        "Falha catastrófica: O arquivo de mídia foi gravado com 0 bytes no servidor.");
             }
 
             // 🎯 Substitua pelo IP real da sua máquina na rede interna da ARSAL
-            String urlDoVideo = "http://192.168.1.157:8085/api/midias/stream/" + nomeUnico;
+            String urlDoVideo = "http://192.168.1.148:8085/api/midias/stream/" + nomeUnico;
 
             Midia midia = new Midia();
             midia.setNome(nome);
@@ -59,32 +61,27 @@ public class MidiaService {
             Midia midiaSalva = midiaRepository.save(midia);
 
             return new MidiaDTO(
-                midiaSalva.getId(),
-                midiaSalva.getNome(),
-                midiaSalva.getUrl(),
-                midiaSalva.getDuracaoSegundos(),
-                midiaSalva.getDataUpload()
-            );
+                    midiaSalva.getId(),
+                    midiaSalva.getNome(),
+                    midiaSalva.getUrl(),
+                    midiaSalva.getDuracaoSegundos(),
+                    midiaSalva.getDataUpload());
 
         } catch (Exception e) {
             throw new RuntimeException("Erro ao salvar o arquivo de vídeo no servidor: " + e.getMessage());
         }
     }
 
-       
-    
-
     public List<MidiaDTO> listarMidias() {
         List<Midia> midiasNoBanco = midiaRepository.findAll();
         // 🎯 Perfeito para Record: Construtor posicional para cada item da lista
         return midiasNoBanco.stream()
                 .map(m -> new MidiaDTO(
-                    m.getId(),
-                    m.getNome(),
-                    m.getUrl(),
-                    m.getDuracaoSegundos(),
-                    m.getDataUpload()
-                ))
+                        m.getId(),
+                        m.getNome(),
+                        m.getUrl(),
+                        m.getDuracaoSegundos(),
+                        m.getDataUpload()))
                 .toList();
     }
 
@@ -101,8 +98,9 @@ public class MidiaService {
     public void editarMidia(Long id, MidiaDTO midiaDTO) {
         Midia midia = midiaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mídia não encontrada com ID: " + id));
-        
-        // 🎯 CORREÇÃO EXATA PARA RECORD: Records usam .nome() e .duracaoSegundos() sem o prefixo "get"
+
+        // 🎯 CORREÇÃO EXATA PARA RECORD: Records usam .nome() e .duracaoSegundos() sem
+        // o prefixo "get"
         midia.setNome(midiaDTO.nome());
         midia.setDuracaoSegundos(midiaDTO.duracaoSegundos());
         midiaRepository.save(midia);
