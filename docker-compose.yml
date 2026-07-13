@@ -25,6 +25,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=andre
       - SPRING_DATASOURCE_PASSWORD=arsal@password
       - ARSAL_UPLOAD_DIRETORIO=/app/arsal_midias/
+      - arsal.upload.diretorio=/app/arsal_midias/
     volumes:
       - C:/arsal_midias:/app/arsal_midias
 
