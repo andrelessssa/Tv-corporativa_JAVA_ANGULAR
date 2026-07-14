@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,9 +23,7 @@ public class MidiaService {
     @Autowired
     private MidiaRepository midiaRepository;
 
-    @Value("${arsal.upload.diretorio}")
-    private String diretorioUpload;
-    
+       
     private final String PASTA_UPLOADS = "/app/uploads"; // Pasta dentro do contêiner Linux
 
     public MidiaDTO salvarMidiaComArquivo(String nome, Integer duracao, MultipartFile arquivo) {
