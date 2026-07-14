@@ -1,5 +1,7 @@
+package br.gov.al.arsal.tv_corporativa_api.config;
+
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry; // 📁 IMPORTAÇÃO CORRIGIDA!
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
