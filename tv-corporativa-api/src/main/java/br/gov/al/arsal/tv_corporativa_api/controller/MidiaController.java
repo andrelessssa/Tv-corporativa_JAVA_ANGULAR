@@ -22,25 +22,26 @@ import br.gov.al.arsal.tv_corporativa_api.service.MidiaService;
 
 @RestController
 @RequestMapping("/api/midias")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "*")
 public class MidiaController {
 
     @Autowired
     private MidiaService midiaService;
 
-    // 🌟 ROTA DE UPLOAD: Recebe o arquivo e delega o upload direto para o MinIO Client
+    // 🌟 ROTA DE UPLOAD: Recebe o arquivo e delega o upload direto para o MinIO
+    // Client
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MidiaDTO> salvar(
             @RequestParam("nome") String nome,
             @RequestParam("duracaoSegundos") Integer duracaoSegundos,
             @RequestParam("arquivo") MultipartFile arquivo) {
-        
+
         MidiaDTO midiaSalva = midiaService.salvarMidiaComArquivo(nome, duracaoSegundos, arquivo);
         return ResponseEntity.status(201).body(midiaSalva);
     }
 
     @GetMapping
-    public ResponseEntity<List<MidiaDTO>> listar(){
+    public ResponseEntity<List<MidiaDTO>> listar() {
         List<MidiaDTO> lista = midiaService.listarMidias();
         return ResponseEntity.ok(lista);
     }
@@ -60,6 +61,6 @@ public class MidiaController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> editarMidia(@PathVariable Long id, @RequestBody MidiaDTO midiaDTO) {
         midiaService.editarMidia(id, midiaDTO);
-        return ResponseEntity.noContent().build();  
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,8 +1,8 @@
 package br.gov.al.arsal.tv_corporativa_api.service;
 
-import java.io.File; // 📁 IMPORTAÇÃO CORRIGIDA!
-import java.nio.file.Files; // 📁 IMPORTAÇÃO CORRIGIDA!
-import java.nio.file.Path; // 📁 IMPORTAÇÃO CORRIGIDA!
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
@@ -23,28 +23,27 @@ public class MidiaService {
     @Autowired
     private MidiaRepository midiaRepository;
 
-       
-    private final String PASTA_UPLOADS = "/app/uploads"; // Pasta dentro do contêiner Linux
+    private final String PASTA_UPLOADS = "/app/uploads"; 
 
     public MidiaDTO salvarMidiaComArquivo(String nome, Integer duracao, MultipartFile arquivo) {
         try {
             String nomeOriginal = arquivo.getOriginalFilename();
             String nomeUnico = UUID.randomUUID().toString() + "_" + nomeOriginal;
 
-            // 📁 Garante que a pasta de uploads exista no disco
+            // 📁 Garante que a pasta de uploads exista
             File diretorio = new File(PASTA_UPLOADS);
             if (!diretorio.exists()) {
                 diretorio.mkdirs();
             }
 
-            // 🚀 Salva o arquivo fisicamente no disco do servidor
+            // 🚀 Salva o arquivo no disco
             Path caminhoDestino = Paths.get(PASTA_UPLOADS).resolve(nomeUnico);
             try (java.io.InputStream is = arquivo.getInputStream()) {
                 Files.copy(is, caminhoDestino, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            // 🎯 O link agora vai apontar direto para a própria API na porta 8080!
-            String urlDoVideo = "http://192.168.1.148:8080/uploads/" + nomeUnico;
+            // 🎯 Usamos caminho relativo! Funciona em qualquer IP de máquina ou Smart TV!
+            String urlDoVideo = "/uploads/" + nomeUnico;
 
             Midia midia = new Midia();
             midia.setNome(nome);
@@ -81,6 +80,16 @@ public class MidiaService {
     public void deletarVideo(Long id) {
         Midia midia = midiaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mídia não encontrada com ID: " + id));
+        
+        // 🧹 Exclui o arquivo físico do disco ao deletar da base
+        try {
+            String nomeArquivo = midia.getUrl().replace("/uploads/", "");
+            Path caminhoArquivo = Paths.get(PASTA_UPLOADS).resolve(nomeArquivo);
+            Files.deleteIfExists(caminhoArquivo);
+        } catch (Exception e) {
+            System.err.println("Aviso: Não foi possível deletar o arquivo físico: " + e.getMessage());
+        }
+
         midiaRepository.delete(midia);
     }
 
@@ -92,7 +101,6 @@ public class MidiaService {
         Midia midia = midiaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mídia não encontrada com ID: " + id));
 
-        // 🎯 Usando os métodos nativos do Record
         midia.setNome(midiaDTO.nome());
         midia.setDuracaoSegundos(midiaDTO.duracaoSegundos());
         midiaRepository.save(midia);
