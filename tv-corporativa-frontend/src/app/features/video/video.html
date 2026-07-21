@@ -1,11 +1,11 @@
 <div class="video-container">
-  
+
   <div class="video-header">
     <div>
       <h1>Gestão de Conteúdo</h1>
       <p>Gerencie a grade de transmissão da TV Corporativa ARSAL</p>
     </div>
-    
+
     <button class="btn-add" (click)="exibirFormulario = true; midiaSelecionada = null">
       <span class="plus-icon">+</span>
       Novo Vídeo
@@ -13,9 +13,9 @@
   </div>
 
   <div class="modal-overlay" *ngIf="exibirFormulario" (click)="exibirFormulario = false; midiaSelecionada = null">
-    
+
     <div class="modal-card" (click)="$event.stopPropagation()">
-      
+
       <div class="modal-header">
         <h3>
           {{ midiaSelecionada ? '✏️ Editar Conteúdo' : '🎬 Cadastrar Novo Conteúdo' }}
@@ -25,37 +25,33 @@
 
       <div class="modal-body">
         <div class="input-group">
-    <label>NOME DO ARQUIVO</label>
-    <input type="text" #nome class="arsal-input" 
-           [value]="midiaSelecionada ? midiaSelecionada.nome : ''" 
-           placeholder="Ex: Campanha Arsal 2024">
-  </div>
+          <label>NOME DO ARQUIVO</label>
+          <input type="text" #nome class="arsal-input" [value]="midiaSelecionada ? midiaSelecionada.nome : ''"
+            placeholder="Ex: Campanha Arsal 2024">
+        </div>
 
-  <div class="input-group">
-    <label>DURAÇÃO (SEGUNDOS)</label>
-    <input type="number" #duracao class="arsal-input" 
-           [value]="midiaSelecionada ? midiaSelecionada.duracaoSegundos : '30'">
-  </div>
+        <div class="input-group">
+          <label>DURAÇÃO (SEGUNDOS)</label>
+          <input type="number" #duracao class="arsal-input"
+            [value]="midiaSelecionada ? midiaSelecionada.duracaoSegundos : '30'">
+        </div>
 
-  <div class="input-group full-width">
-    <label>SELECIONE O ARQUIVO DE VÍDEO (.MP4)</label>
-    <input type="file" 
-           class="arsal-input" 
-           (change)="onFileSelected($event)" 
-           accept="video/mp4">
-  </div>
+        <div class="input-group full-width">
+          <label>SELECIONE O ARQUIVO DE VÍDEO (.MP4)</label>
+          <input type="file" class="arsal-input" (change)="onFileSelected($event)" accept="video/mp4">
+        </div>
       </div>
 
       <div class="modal-footer">
         <button class="btn-cancel" (click)="exibirFormulario = false; midiaSelecionada = null">Cancelar</button>
-        
-       <button *ngIf="!midiaSelecionada" class="btn-save" (click)="enviarDados(nome.value, duracao.value)">
-  💾 Salvar Novo
-</button>
 
-     <button *ngIf="midiaSelecionada" class="btn-save" (click)="salvarEdicao(nome.value, duracao.value)">
-  ⚙️ Alterar Dados
-</button>
+        <button *ngIf="!midiaSelecionada" class="btn-save" (click)="enviarDados(nome.value, duracao.value)">
+          💾 Salvar Novo
+        </button>
+
+        <button *ngIf="midiaSelecionada" class="btn-save" (click)="salvarEdicao(nome.value, duracao.value)">
+          ⚙️ Alterar Dados
+        </button>
       </div>
     </div>
   </div>
@@ -97,8 +93,7 @@
 
           <tr *ngIf="listaDeMidias.length === 0">
             <td colspan="4" class="empty-state">
-              <div class="empty-icon">📡</div>
-              Aguardando conexão com o banco de dados da ARSAL...
+              <span>🎬</span> Aguardando vídeos...
             </td>
           </tr>
         </tbody>
