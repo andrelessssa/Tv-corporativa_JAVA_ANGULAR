@@ -25,7 +25,7 @@ export class TvLoopComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.carregarPlaylist();
 
-    // 🔄 Recarrega a página automaticamente a cada 4 horas para esvaziar a RAM das Smart TVs
+    // 🔄 Recarrega a página automaticamente a cada 4 horas para esvaziar a RAM das Smart TVs (Samsung/TCL)
     this.autoReloadTimer = setInterval(() => {
       window.location.reload();
     }, 4 * 60 * 60 * 1000);
@@ -36,15 +36,15 @@ export class TvLoopComponent implements OnInit, OnDestroy {
     clearInterval(this.autoReloadTimer);
   }
 
-  // 🔄 Busca a lista de vídeos cadastrados na sua API Java da ARSAL
-  carregarPlaylist(): void {
+  // 🔄 Busca a lista de vídeos cadastrados na API Java da ARSAL e atualiza a grade
+  carregarPlaylist(forcarInicio: boolean = false): void {
     this.videoService.listar().subscribe({
       next: (dados) => {
         if (dados && dados.length > 0) {
           this.listaDeMidias = dados;
           
-          // Se for a primeira vez ou se a URL limpou, inicia o vídeo 0
-          if (!this.videoUrlAtual) {
+          // Se for a primeira carga OU se chegou ao fim da playlist, toca o primeiro vídeo (índice 0)
+          if (!this.videoUrlAtual || forcarInicio) {
             this.reproduzirVideo(0);
           }
         } else {
@@ -55,13 +55,17 @@ export class TvLoopComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('⚠️ Erro ao carregar a playlist da TV:', err);
-        // Em caso de oscilação na rede, tenta reconectar em 10s sem travar a tela
-        setTimeout(() => this.carregarPlaylist(), 10000);
+        // Se a API oscilar no recomeço, toca o vídeo 0 da playlist em memória para a TV não parar
+        if (forcarInicio && this.listaDeMidias.length > 0) {
+          this.reproduzirVideo(0);
+        } else {
+          setTimeout(() => this.carregarPlaylist(), 10000);
+        }
       }
     });
   }
 
-  // 🎬 Configura o vídeo atual no player com liberação de RAM
+  // 🎬 Configura e executa o vídeo atual no player
   reproduzirVideo(index: number): void {
     if (this.listaDeMidias.length === 0) return;
 
@@ -77,11 +81,11 @@ export class TvLoopComponent implements OnInit, OnDestroy {
         
         player.load();
         player.play().catch(err => {
-          console.warn('⚠️ Autoplay travou ou foi bloqueado pela TV. Pulando...', err);
+          console.warn('⚠️ Autoplay travou ou foi bloqueado pela TV. Pulando para o próximo...', err);
           this.proximoVideo();
         });
 
-        // 🐕 Ativa o timer de segurança para evitar tela preta travada
+        // 🐕 Ativa o timer de segurança (Watchdog) para evitar tela preta travada
         const duracao = midia.duracaoSegundos || 30;
         this.iniciarWatchdog(duracao);
       }
@@ -100,26 +104,27 @@ export class TvLoopComponent implements OnInit, OnDestroy {
       player.load();
     }
 
-    // Se ainda houver próximos vídeos na lista, avança 1. Se chegou ao fim, busca a lista nova no banco e volta pro 0!
+    // Se ainda houver próximos vídeos na lista, avança 1. 
+    // Se chegou ao fim, busca a lista nova do banco e recomeça do vídeo 0!
     if (this.indiceAtual < this.listaDeMidias.length - 1) {
       this.reproduzirVideo(this.indiceAtual + 1);
     } else {
       console.log('Fim da playlist alcançado. Atualizando grade e reiniciando loop... 🔄🔥');
-      this.carregarPlaylist();
+      this.carregarPlaylist(true); // 👈 Força a tocar o vídeo 0 da playlist atualizada!
     }
   }
 
-  // ⚠️ Se um vídeo for excluído do servidor ou der erro de stream, pula direto
+  // ⚠️ Se um vídeo for excluído do servidor ou der erro de streaming, pula para o próximo
   tratarErroVideo(event: any): void {
     console.warn('⚠️ Erro ao carregar a mídia atual na TV. Pulando para a próxima...', event);
     this.proximoVideo();
   }
 
-  // 🐕 Watchdog: Se a TV travar e não disparar o evento (ended), força o próximo vídeo
+  // 🐕 Watchdog: Se a TV travar e não disparar o evento (ended), força o avanço automático
   private iniciarWatchdog(duracaoSegundos: number): void {
     clearTimeout(this.watchdogTimer);
 
-    // Dá margem de 5 segundos além da duração cadastrada do vídeo
+    // Concede margem de 5 segundos além da duração cadastrada do vídeo
     const tempoLimite = (duracaoSegundos + 5) * 1000;
 
     this.watchdogTimer = setTimeout(() => {
