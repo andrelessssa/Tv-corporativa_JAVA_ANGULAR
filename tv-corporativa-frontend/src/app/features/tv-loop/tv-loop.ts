@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MidiaDTO, VideoService } from '../video/services/video'; // 👈 Buscando o service que você já criou!
+import { MidiaDTO, VideoService } from '../video/services/video';
 
 @Component({
   selector: 'app-tv-loop',
@@ -9,59 +9,122 @@ import { MidiaDTO, VideoService } from '../video/services/video'; // 👈 Buscan
   templateUrl: './tv-loop.html',
   styleUrls: ['./tv-loop.scss']
 })
-export class TvLoopComponent implements OnInit {
+export class TvLoopComponent implements OnInit, OnDestroy {
   
-  // 🎯 Captura a tag <video> do HTML para controlarmos via JavaScript
   @ViewChild('videoPlayer') videoPlayer!: ElementRef<HTMLVideoElement>;
 
   listaDeMidias: MidiaDTO[] = [];
-  indiceAtual: number = 0; // Controla qual vídeo da lista está passando
+  indiceAtual: number = 0;
   videoUrlAtual: string = '';
+
+  private watchdogTimer: any;
+  private autoReloadTimer: any;
 
   constructor(private videoService: VideoService) {}
 
   ngOnInit(): void {
     this.carregarPlaylist();
+
+    // 🔄 Recarrega a página automaticamente a cada 4 horas para esvaziar a RAM das Smart TVs
+    this.autoReloadTimer = setInterval(() => {
+      window.location.reload();
+    }, 4 * 60 * 60 * 1000);
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.watchdogTimer);
+    clearInterval(this.autoReloadTimer);
   }
 
   // 🔄 Busca a lista de vídeos cadastrados na sua API Java da ARSAL
   carregarPlaylist(): void {
     this.videoService.listar().subscribe({
       next: (dados) => {
-        this.listaDeMidias = dados;
-        if (this.listaDeMidias.length > 0) {
-          this.reproduzirVideo(0); // Começa tocando o primeiro vídeo da lista (posição 0)
+        if (dados && dados.length > 0) {
+          this.listaDeMidias = dados;
+          
+          // Se for a primeira vez ou se a URL limpou, inicia o vídeo 0
+          if (!this.videoUrlAtual) {
+            this.reproduzirVideo(0);
+          }
+        } else {
+          this.videoUrlAtual = '';
+          // Se o banco estiver sem vídeos, tenta buscar novamente em 10 segundos
+          setTimeout(() => this.carregarPlaylist(), 10000);
         }
       },
-      error: (err) => console.error('Erro ao carregar a playlist da TV:', err)
+      error: (err) => {
+        console.error('⚠️ Erro ao carregar a playlist da TV:', err);
+        // Em caso de oscilação na rede, tenta reconectar em 10s sem travar a tela
+        setTimeout(() => this.carregarPlaylist(), 10000);
+      }
     });
   }
 
-  // 🎬 Configura o vídeo atual no player
+  // 🎬 Configura o vídeo atual no player com liberação de RAM
   reproduzirVideo(index: number): void {
-    this.indiceAtual = index;
-    this.videoUrlAtual = this.listaDeMidias[index].url;
-    console.log(`Tocando agora: ${this.listaDeMidias[index].nome} 📺`);
+    if (this.listaDeMidias.length === 0) return;
 
-    // Dá um pequeno delay para o Angular atualizar a URL na tela e manda dar o Play
+    this.indiceAtual = index;
+    const midia = this.listaDeMidias[index];
+    this.videoUrlAtual = midia.url;
+    
+    console.log(`Tocando agora: ${midia.nome} 📺`);
+
     setTimeout(() => {
       if (this.videoPlayer && this.videoPlayer.nativeElement) {
-        this.videoPlayer.nativeElement.load();
-        this.videoPlayer.nativeElement.play().catch(err => {
-          console.log('Aguardando interação do usuário ou autoplay liberado:', err);
+        const player = this.videoPlayer.nativeElement;
+        
+        player.load();
+        player.play().catch(err => {
+          console.warn('⚠️ Autoplay travou ou foi bloqueado pela TV. Pulando...', err);
+          this.proximoVideo();
         });
+
+        // 🐕 Ativa o timer de segurança para evitar tela preta travada
+        const duracao = midia.duracaoSegundos || 30;
+        this.iniciarWatchdog(duracao);
       }
-    }, 300); // 300ms de delay para garantir que a URL foi atualizada
+    }, 200);
   }
 
   // 🔄 MÁGICA DO LOOP: Disparado automaticamente quando o vídeo ativo termina!
   proximoVideo(): void {
-    // Se ainda houver próximos vídeos na lista, avança 1. Se chegou ao fim, volta para o 0!
+    clearTimeout(this.watchdogTimer);
+
+    // 🧹 LIMPEZA DE MEMÓRIA CRÍTICA (Descarrega o buffer da RAM da Smart TV):
+    if (this.videoPlayer && this.videoPlayer.nativeElement) {
+      const player = this.videoPlayer.nativeElement;
+      player.pause();
+      player.removeAttribute('src'); 
+      player.load();
+    }
+
+    // Se ainda houver próximos vídeos na lista, avança 1. Se chegou ao fim, busca a lista nova no banco e volta pro 0!
     if (this.indiceAtual < this.listaDeMidias.length - 1) {
       this.reproduzirVideo(this.indiceAtual + 1);
     } else {
-      console.log('Fim da playlist alcançado. Reiniciando loop infinito... 🔄🔥');
-      this.reproduzirVideo(0); 
+      console.log('Fim da playlist alcançado. Atualizando grade e reiniciando loop... 🔄🔥');
+      this.carregarPlaylist();
     }
+  }
+
+  // ⚠️ Se um vídeo for excluído do servidor ou der erro de stream, pula direto
+  tratarErroVideo(event: any): void {
+    console.warn('⚠️ Erro ao carregar a mídia atual na TV. Pulando para a próxima...', event);
+    this.proximoVideo();
+  }
+
+  // 🐕 Watchdog: Se a TV travar e não disparar o evento (ended), força o próximo vídeo
+  private iniciarWatchdog(duracaoSegundos: number): void {
+    clearTimeout(this.watchdogTimer);
+
+    // Dá margem de 5 segundos além da duração cadastrada do vídeo
+    const tempoLimite = (duracaoSegundos + 5) * 1000;
+
+    this.watchdogTimer = setTimeout(() => {
+      console.warn('⚠️ Watchdog acionado: O vídeo travou na tela preta. Forçando avanço...');
+      this.proximoVideo();
+    }, tempoLimite);
   }
 }
