@@ -17,13 +17,13 @@ Sistema web full stack que exibe conteúdo nas TVs corporativas da ARSAL (Agênc
 ```bash
 git clone https://github.com/andrelessssa/Tv-corporativa_JAVA_ANGULAR.git
 cd Tv-corporativa_JAVA_ANGULAR
-# crie o arquivo de configuração: 
+# crie localmente o arquivo de configuração com as credenciais do banco (não versionado)
 docker compose up -d --build
 ```
-Acesse em `http://IP-DA-MAQUINA:[porta]`.
+Acesse em `http://IP-DA-MAQUINA`.
 
 ## Configuração
-Senhas e arquivos de configuração não ficam no repositório (ver `.gitignore`). 
+Senhas e arquivos de configuração não ficam no repositório (ver `.gitignore`). Crie-os localmente antes de subir o projeto.
 
 ## Estrutura
 - `tv-corporativa-api`: API em Spring Boot
