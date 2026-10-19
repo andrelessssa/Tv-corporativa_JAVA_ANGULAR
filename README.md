@@ -9,7 +9,6 @@ Sistema web full stack que exibe conteúdo nas TVs corporativas da ARSAL (Agênc
 - **Infra:** Docker e Docker Compose
 
 ## Funcionalidades
-- [Login com acesso de administrador e de TV]
 - Player de vídeo para exibição nas TVs
 - Controle de memória RAM e watchdog no frontend, para operação contínua
 - Armazenamento local dos arquivos
@@ -18,13 +17,13 @@ Sistema web full stack que exibe conteúdo nas TVs corporativas da ARSAL (Agênc
 ```bash
 git clone https://github.com/andrelessssa/Tv-corporativa_JAVA_ANGULAR.git
 cd Tv-corporativa_JAVA_ANGULAR
-# crie o arquivo de configuração: [nome do arquivo e variáveis]
+# crie o arquivo de configuração: 
 docker compose up -d --build
 ```
 Acesse em `http://IP-DA-MAQUINA:[porta]`.
 
 ## Configuração
-Senhas e arquivos de configuração não ficam no repositório (ver `.gitignore`). [Liste as variáveis necessárias, sem valores reais.]
+Senhas e arquivos de configuração não ficam no repositório (ver `.gitignore`). 
 
 ## Estrutura
 - `tv-corporativa-api`: API em Spring Boot
